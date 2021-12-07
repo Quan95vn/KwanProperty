@@ -7,7 +7,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA9D701F-93A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KwanProperty.IdentityServer4", "src\KwanProperty.IdentityServer4\KwanProperty.IdentityServer4.csproj", "{87F8C794-98B9-439F-9652-53B2A8AB11CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KwanProperty.MvcClient", "src\KwanProperty.MvcClient\KwanProperty.MvcClient.csproj", "{4154D130-C0EC-45EA-AC52-96652EC3BC9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KwanProperty.MvcClient", "src\KwanProperty.MvcClient\KwanProperty.MvcClient.csproj", "{4154D130-C0EC-45EA-AC52-96652EC3BC9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "User", "User", "{845076AB-E21C-4219-8469-48F08A8F0736}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KwanProperty.User.Api", "src\User\KwanProperty.User.Api\KwanProperty.User.Api.csproj", "{5FF90116-D4E6-4DAE-B109-8F056742D9EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +27,10 @@ Global
 		{4154D130-C0EC-45EA-AC52-96652EC3BC9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4154D130-C0EC-45EA-AC52-96652EC3BC9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4154D130-C0EC-45EA-AC52-96652EC3BC9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FF90116-D4E6-4DAE-B109-8F056742D9EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF90116-D4E6-4DAE-B109-8F056742D9EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF90116-D4E6-4DAE-B109-8F056742D9EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF90116-D4E6-4DAE-B109-8F056742D9EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +38,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{87F8C794-98B9-439F-9652-53B2A8AB11CA} = {BA9D701F-93A6-4CF9-AA77-E3A01A99B552}
 		{4154D130-C0EC-45EA-AC52-96652EC3BC9F} = {BA9D701F-93A6-4CF9-AA77-E3A01A99B552}
+		{845076AB-E21C-4219-8469-48F08A8F0736} = {BA9D701F-93A6-4CF9-AA77-E3A01A99B552}
+		{5FF90116-D4E6-4DAE-B109-8F056742D9EE} = {845076AB-E21C-4219-8469-48F08A8F0736}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {71C626BD-9BF2-42D8-908F-68BBA23CCBC9}

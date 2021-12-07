@@ -30,8 +30,9 @@ namespace KwanProperty.IdentityServer4
                 options.EmitStaticAudienceClaim = true;
             })
                 .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiScopes(Config.ApiScopes)
+                .AddInMemoryApiResources(Config.Apis)
                 .AddInMemoryClients(Config.Clients)
+                .AddInMemoryApiScopes(Config.GetApiScopes())
                 .AddTestUsers(TestUsers.Users);
 
             // not recommended for production - you need to store your key material somewhere secure

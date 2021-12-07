@@ -23,12 +23,25 @@ namespace KwanProperty.IdentityServer4
                     {
                         "role1", "role2", "role3", "role4"
                     })
-
+                    
             };
 
-        public static IEnumerable<ApiScope> ApiScopes =>
-            new ApiScope[]
-            { };
+        public static IEnumerable<ApiResource> Apis =>
+             new ApiResource[]
+             {
+                new ApiResource(
+                    "KwanPropertyUserApi",
+                    "Kwan Property User Api",
+                    new List<string>() { "role" })
+             };
+
+        public static IEnumerable<ApiScope> GetApiScopes()
+        {
+            return new List<ApiScope>
+            {
+                new ApiScope("KwanPropertyUserApi")
+            };
+        }
 
         public static IEnumerable<Client> Clients =>
             new Client[]
@@ -52,7 +65,8 @@ namespace KwanProperty.IdentityServer4
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
-                        "roles"
+                        "roles",
+                        "KwanPropertyUserApi"
                     },
                     ClientSecrets =
                     {

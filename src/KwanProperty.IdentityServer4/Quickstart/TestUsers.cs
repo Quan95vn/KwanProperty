@@ -26,7 +26,9 @@ namespace IdentityServerHost.Quickstart.UI
                      new Claim("given_name", "Quan"),
                      new Claim("family_name", "Tran"),
                      new Claim("address", "Kham Thien 1"),
-                     new Claim("role1", "FreeUser1")
+                     new Claim("role2", "role2"),
+                     new Claim("role4", "role4"),
+
                  }
              },
              new TestUser

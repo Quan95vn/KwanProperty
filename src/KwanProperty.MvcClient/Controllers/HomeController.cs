@@ -29,8 +29,44 @@ namespace KwanProperty.MvcClient.Controllers
 
         public async Task<IActionResult> Index()
         {
+            try
+            {
+                await WriteOutIdentityInformation();
+
+                var httpClient = _httpClientFactory.CreateClient("KwanUserApiClient");
+
+                var request = new HttpRequestMessage(
+                 HttpMethod.Get,
+                 "/api/account/");
+
+                var response = await httpClient.SendAsync(
+                    request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        //return View(new GalleryIndexViewModel(
+                        //    await JsonSerializer.DeserializeAsync<List<Image>>(responseStream)));
+                    }
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+                        response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    return RedirectToAction("AccessDenied", "Authorization");
+                }
+            }
+            catch(Exception ex)
+            {
+            }
+
+            return View();
+        }
+
+        private async Task WriteOutIdentityInformation()
+        {
             var identityToken = await HttpContext
-              .GetTokenAsync(OpenIdConnectParameterNames.IdToken);
+            .GetTokenAsync(OpenIdConnectParameterNames.IdToken);
 
             // write it out
             Debug.WriteLine($"Identity token: {identityToken}");
@@ -40,9 +76,8 @@ namespace KwanProperty.MvcClient.Controllers
             {
                 Debug.WriteLine($"Claim type: {claim.Type} - Claim value: {claim.Value}");
             }
-
-            return View();
         }
+
 
         public async Task<IActionResult> Address()
         {

@@ -1,3 +1,4 @@
+using KwanProperty.MvcClient.HttpHandlers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -31,13 +32,17 @@ namespace KwanProperty.MvcClient
         {
             services.AddControllersWithViews();
 
-            // create an HttpClient used for accessing the API
-            services.AddHttpClient("KwanApiClient", client =>
+            services.AddHttpContextAccessor();
+
+            services.AddTransient<BearerTokenHandler>();
+
+            // create an HttpClient used for accessing the User Api
+            services.AddHttpClient("KwanUserApiClient", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:44366/");
+                client.BaseAddress = new Uri("https://localhost:44373/");
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-            });
+            }).AddHttpMessageHandler<BearerTokenHandler>();
 
             // create an HttpClient used for accessing the IdentityServer
             services.AddHttpClient("IdentityServerClient", client =>
@@ -52,17 +57,21 @@ namespace KwanProperty.MvcClient
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.AccessDeniedPath = "/Authorization/AccessDenied";
+            })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.Authority = "https://localhost:44397/";
                 options.ClientId = "Mvc_Client";
                 options.ResponseType = "code";
-               
+
                 options.Scope.Add("address");
                 options.Scope.Add("roles");
-               
+                options.Scope.Add("KwanPropertyUserApi");
+
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.DeleteClaim("s_hash");
