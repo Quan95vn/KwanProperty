@@ -15,36 +15,43 @@ namespace IdentityServerHost.Quickstart.UI
     {
         public static List<TestUser> Users = new List<TestUser>
         {
-             new TestUser
-             {
-                 SubjectId = "00000000-0000-0000-0000-000000000001",
-                 Username = "Quan",
-                 Password = "12345678",
+            new TestUser
+            {
+                SubjectId = "00000000-0000-0000-0000-000000000001",
+                Username = "Quan",
+                Password = "12345678",
 
-                 Claims = new List<Claim>
-                 {
-                     new Claim("given_name", "Quan"),
-                     new Claim("family_name", "Tran"),
-                     new Claim("address", "Kham Thien 1"),
-                     new Claim("role2", "role2"),
-                     new Claim("role4", "role4"),
+                // Claim này sẽ dc gen ra trong identity token
+                Claims = new List<Claim>
+                {
+                new Claim("given_name", "Quan"),
+                    new Claim("family_name", "Tran"),
+                    new Claim("address", "Kham Thien 1"),
+                    new Claim("admin", "admin"),
+                    new Claim("super_user", "super_user"),
+                    new Claim("moderator", "moderator"),
 
-                 }
-             },
-             new TestUser
-             {
-                 SubjectId = "00000000-0000-0000-0000-000000000002",
-                 Username = "Mai",
-                 Password = "12345678",
+                    new Claim("subscription_level", "PaidUser"),
+                    new Claim("country", "vn")
+                }
+            },
+            new TestUser
+            {
+                SubjectId = "00000000-0000-0000-0000-000000000002",
+                Username = "Mai",
+                Password = "12345678",
 
-                 Claims = new List<Claim>
-                 {
-                     new Claim("given_name", "Mai"),
-                     new Claim("family_name", "Tran"),
-                     new Claim("address", "Kham Thien 2"),
-                     new Claim("role1", "PayingUser")
-                 }
-             }
+                Claims = new List<Claim>
+                {
+                    new Claim("given_name", "Mai"),
+                    new Claim("family_name", "Tran"),
+                    new Claim("address", "Kham Thien 2"),
+                    new Claim("user", "user"),
+
+                    new Claim("subscription_level", "FreeUser"),
+                    new Claim("country", "vn"),
+                }
+            }
          };
     }
 }

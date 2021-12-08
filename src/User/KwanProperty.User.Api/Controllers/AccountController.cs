@@ -14,7 +14,7 @@ namespace KwanProperty.User.Api.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return Ok("success");
         }
     }
 }

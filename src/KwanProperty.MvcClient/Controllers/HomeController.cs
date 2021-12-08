@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace KwanProperty.MvcClient.Controllers
@@ -27,17 +28,14 @@ namespace KwanProperty.MvcClient.Controllers
                 throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<IActionResult> Index()
+        [Authorize(Policy = "PaidUserCanCallGetUserApi")]
+        public async Task<IActionResult> GetUserApi()
         {
             try
             {
-                await WriteOutIdentityInformation();
-
                 var httpClient = _httpClientFactory.CreateClient("KwanUserApiClient");
 
-                var request = new HttpRequestMessage(
-                 HttpMethod.Get,
-                 "/api/account/");
+                var request = new HttpRequestMessage(HttpMethod.Get, "/api/account/");
 
                 var response = await httpClient.SendAsync(
                     request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -46,8 +44,7 @@ namespace KwanProperty.MvcClient.Controllers
                 {
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        //return View(new GalleryIndexViewModel(
-                        //    await JsonSerializer.DeserializeAsync<List<Image>>(responseStream)));
+                        return View(new HomeViewModel(await JsonSerializer.DeserializeAsync<string>(responseStream)));
                     }
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
@@ -56,10 +53,17 @@ namespace KwanProperty.MvcClient.Controllers
                     return RedirectToAction("AccessDenied", "Authorization");
                 }
             }
-            catch(Exception ex)
+            catch
             {
+                return RedirectToAction("AccessDenied", "Authorization");
             }
 
+            return View();
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            await WriteOutIdentityInformation();
             return View();
         }
 
@@ -118,6 +122,42 @@ namespace KwanProperty.MvcClient.Controllers
 
         public async Task Logout()
         {
+            //var client = _httpClientFactory.CreateClient("IDPClient");
+
+            //var discoveryDocumentResponse = await client.GetDiscoveryDocumentAsync();
+            //if (discoveryDocumentResponse.IsError)
+            //{
+            //    throw new Exception(discoveryDocumentResponse.Error);
+            //}
+
+            //var accessTokenRevocationResponse = await client.RevokeTokenAsync(
+            //    new TokenRevocationRequest
+            //    {
+            //        Address = discoveryDocumentResponse.RevocationEndpoint,
+            //        ClientId = "imagegalleryclient",
+            //        ClientSecret = "secret",
+            //        Token = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken)
+            //    });
+
+            //if (accessTokenRevocationResponse.IsError)
+            //{
+            //    throw new Exception(accessTokenRevocationResponse.Error);
+            //}
+
+            //var refreshTokenRevocationResponse = await client.RevokeTokenAsync(
+            //    new TokenRevocationRequest
+            //    {
+            //        Address = discoveryDocumentResponse.RevocationEndpoint,
+            //        ClientId = "imagegalleryclient",
+            //        ClientSecret = "secret",
+            //        Token = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken)
+            //    });
+
+            //if (refreshTokenRevocationResponse.IsError)
+            //{
+            //    throw new Exception(accessTokenRevocationResponse.Error);
+            //}
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }

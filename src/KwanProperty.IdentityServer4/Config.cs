@@ -10,6 +10,9 @@ namespace KwanProperty.IdentityServer4
 {
     public static class Config
     {
+        /// <summary>
+        /// Danh sách tài nguyên được phép truy cập, trong mỗi tài nguyên có chứa nhiều claim khác nhau
+        /// </summary>
         public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
             {
@@ -21,33 +24,65 @@ namespace KwanProperty.IdentityServer4
                     "Your's role(s)",
                     new List<string>
                     {
-                        "role1", "role2", "role3", "role4"
-                    })
-                    
+                        "admin", "super_user", "moderator", "user"
+                    }),
+                 new IdentityResource(
+                    "subscription_level",
+                    "Subscription Level",
+                    new List<string>
+                    {
+                        "subscription_level"
+                    }),
+                 new IdentityResource(
+                    "country",
+                    "Country",
+                    new List<string>
+                    {
+                        "country"
+                    }),
+
             };
 
-        public static IEnumerable<ApiResource> Apis =>
-             new ApiResource[]
-             {
-                new ApiResource(
-                    "KwanPropertyUserApi",
-                    "Kwan Property User Api",
-                    new List<string>() { "role" })
-             };
-
+        /// <summary>
+        /// Phạm vi scope của api, api được truy cập tới claim nào
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<ApiScope> GetApiScopes()
         {
             return new List<ApiScope>
             {
-                new ApiScope("KwanPropertyUserApi")
+                new ApiScope(
+                    "KwanPropertyUserApi", 
+                    "KwanProperty Api Scope",
+                    new List<string> { "admin", "super_user"}) // claim sẽ được thêm trong access_token
             };
         }
 
+        public static IEnumerable<ApiResource> ApiResources =>
+             new ApiResource[]
+             {
+                new ApiResource
+                (
+                    "KwanPropertyUserApi",
+                    "Kwan Property User Api"
+                )
+                {
+                    Scopes = { "KwanPropertyUserApi"},
+                    ApiSecrets = { new Secret("KwanPropertyUserApiSecret".Sha256())}
+                }
+             };
+
+        /// <summary>
+        /// Danh sách client và config tài nguyền client đc truy cập
+        /// </summary>
         public static IEnumerable<Client> Clients =>
             new Client[]
             {
                 new Client
                 {
+                    AccessTokenLifetime = 120,
+                    AllowOfflineAccess = true,
+                    UpdateAccessTokenClaimsOnRefresh = true,
                     ClientName = "Mvc",
                     ClientId= "Mvc_Client",
                     AllowedGrantTypes = GrantTypes.Code,
@@ -66,18 +101,14 @@ namespace KwanProperty.IdentityServer4
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
                         "roles",
-                        "KwanPropertyUserApi"
+                        "KwanPropertyUserApi",
+                        "subscription_level",
+                        "country"
                     },
                     ClientSecrets =
                     {
                         new Secret("secret".Sha256())
                     }
-                },
-                new Client
-                {
-                    ClientName = "Mobile",
-                    ClientId = "Mobile_Client",
-                    AllowedGrantTypes = GrantTypes.Code,
                 }
             };
     }

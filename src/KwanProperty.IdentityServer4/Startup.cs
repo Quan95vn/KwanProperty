@@ -27,12 +27,12 @@ namespace KwanProperty.IdentityServer4
             var builder = services.AddIdentityServer(options =>
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-                options.EmitStaticAudienceClaim = true;
+                //options.EmitStaticAudienceClaim = false;
             })
                 .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiResources(Config.Apis)
-                .AddInMemoryClients(Config.Clients)
+                .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryApiScopes(Config.GetApiScopes())
+                .AddInMemoryClients(Config.Clients)
                 .AddTestUsers(TestUsers.Users);
 
             // not recommended for production - you need to store your key material somewhere secure

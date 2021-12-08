@@ -1,4 +1,6 @@
 using IdentityServer4.AccessTokenValidation;
+using KwanProperty.User.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,11 +32,27 @@ namespace KwanProperty.User.Api
 
             services.AddControllers();
 
+            services.AddHttpContextAccessor();
+
+            services.AddScoped<IAuthorizationHandler, CustomRequirementHandler>();
+
+            services.AddAuthorization(authorizationOptions =>
+            {
+                authorizationOptions.AddPolicy(
+                    "CustomPolicy",
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireAuthenticatedUser();
+                        policyBuilder.AddRequirements(new CustomRequirement());
+                    });
+            });
+
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
               .AddIdentityServerAuthentication(options =>
               {
                   options.Authority = "https://localhost:44397";
                   options.ApiName = "KwanPropertyUserApi";
+                  options.ApiSecret = "KwanPropertyUserApiSecret";
               });
 
             //services.AddSwaggerGen(c =>
@@ -49,8 +67,8 @@ namespace KwanProperty.User.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "KwanProperty.User.Api v1"));
+                //app.UseSwagger();
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "KwanProperty.User.Api v1"));
             }
 
             app.UseHttpsRedirection();

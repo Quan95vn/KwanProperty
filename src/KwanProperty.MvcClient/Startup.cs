@@ -1,3 +1,4 @@
+using IdentityModel;
 using KwanProperty.MvcClient.HttpHandlers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -31,6 +33,18 @@ namespace KwanProperty.MvcClient
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    "PaidUserCanCallGetUserApi",
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireAuthenticatedUser();
+                        policyBuilder.RequireClaim("subscription_level", "PaidUser");
+                        policyBuilder.RequireClaim("country", "vn");
+                    });
+            });
 
             services.AddHttpContextAccessor();
 
@@ -71,20 +85,31 @@ namespace KwanProperty.MvcClient
                 options.Scope.Add("address");
                 options.Scope.Add("roles");
                 options.Scope.Add("KwanPropertyUserApi");
+                options.Scope.Add("subscription_level");
+                options.Scope.Add("country");
+                options.Scope.Add("offline_access");
 
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.DeleteClaim("s_hash");
                 options.ClaimActions.DeleteClaim("auth_time");
 
-                options.ClaimActions.MapUniqueJsonKey("role1", "role1");
-                options.ClaimActions.MapUniqueJsonKey("role2", "role2");
-                options.ClaimActions.MapUniqueJsonKey("role3", "role3");
-                options.ClaimActions.MapUniqueJsonKey("role4", "role4");
+                options.ClaimActions.MapUniqueJsonKey("admin", "admin");
+                options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
+                options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");
+                options.ClaimActions.MapUniqueJsonKey("user", "user");
+                options.ClaimActions.MapUniqueJsonKey("subscription_level", "subscription_level");
+                options.ClaimActions.MapUniqueJsonKey("country", "country");
+
 
                 options.SaveTokens = true;
                 options.ClientSecret = "secret";
                 options.GetClaimsFromUserInfoEndpoint = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = JwtClaimTypes.GivenName,
+                    RoleClaimType = JwtClaimTypes.Role
+                };
             });
         }
 
