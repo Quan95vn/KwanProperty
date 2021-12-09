@@ -44,20 +44,8 @@ namespace KwanProperty.IdentityServer4
             };
 
         /// <summary>
-        /// Phạm vi scope của api, api được truy cập tới claim nào
+        /// Khai báo tài nguyên api, tên api phải match mới project api
         /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<ApiScope> GetApiScopes()
-        {
-            return new List<ApiScope>
-            {
-                new ApiScope(
-                    "KwanPropertyUserApi", 
-                    "KwanProperty Api Scope",
-                    new List<string> { "admin", "super_user"}) // claim sẽ được thêm trong access_token
-            };
-        }
-
         public static IEnumerable<ApiResource> ApiResources =>
              new ApiResource[]
              {
@@ -71,6 +59,19 @@ namespace KwanProperty.IdentityServer4
                     ApiSecrets = { new Secret("KwanPropertyUserApiSecret".Sha256())}
                 }
              };
+
+        /// <summary>
+        /// Phạm vi scope của api, api được truy cập tới claim nào
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<ApiScope> ApiScopes =>
+            new ApiScope[]
+            {
+                new ApiScope(
+                    "KwanPropertyUserApi",
+                    "KwanProperty Api Scope",
+                    new List<string> { "admin", "super_user"}) // claim sẽ được thêm trong access_token
+            };        
 
         /// <summary>
         /// Danh sách client và config tài nguyền client đc truy cập
@@ -111,5 +112,28 @@ namespace KwanProperty.IdentityServer4
                     }
                 }
             };
+
+        #region SQL Tables
+        /*
+            SELECT * FROM "ApiResources"
+            SELECT * FROM "ApiResourceScopes"
+            SELECT * FROM "ApiResourceClaims"
+
+            SELECT * FROM "ApiScopes"
+            SELECT * FROM "ApiScopeClaims"
+            SELECT * FROM "ClientGrantTypes"
+
+            SELECT * FROM "ClientRedirectUris"
+            SELECT * FROM "ClientScopes"
+            SELECT * FROM "ClientSecrets"
+            SELECT * FROM "Clients"
+            SELECT * FROM "IdentityResources";
+            SELECT * FROM "IdentityResourceClaims";
+
+            SELECT * FROM "DeviceCodes"
+            SELECT * FROM "PersistedGrants"
+         */
+
+        #endregion
     }
 }
