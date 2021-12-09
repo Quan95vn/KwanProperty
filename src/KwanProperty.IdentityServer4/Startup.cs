@@ -52,7 +52,7 @@ namespace KwanProperty.IdentityServer4
             builder.AddConfigurationStore(options =>
             {
                 options.ConfigureDbContext = builder =>
-                    builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), 
+                    builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
                     options => options.MigrationsAssembly(migrationsAssembly));
             });
 

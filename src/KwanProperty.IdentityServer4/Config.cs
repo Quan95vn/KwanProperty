@@ -11,7 +11,7 @@ namespace KwanProperty.IdentityServer4
     public static class Config
     {
         /// <summary>
-        /// Danh sách tài nguyên được phép truy cập, trong mỗi tài nguyên có chứa nhiều claim khác nhau
+        /// Danh sách tài nguyên được phép truy cập, trong mỗi tài nguyên có thể truy cập tới nhiều claim
         /// </summary>
         public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
@@ -44,7 +44,7 @@ namespace KwanProperty.IdentityServer4
             };
 
         /// <summary>
-        /// Khai báo tài nguyên api, tên api phải match mới project api
+        /// Khai báo tài nguyên api
         /// </summary>
         public static IEnumerable<ApiResource> ApiResources =>
              new ApiResource[]
@@ -55,13 +55,13 @@ namespace KwanProperty.IdentityServer4
                     "Kwan Property User Api"
                 )
                 {
-                    Scopes = { "KwanPropertyUserApi"},
+                    Scopes = { "KwanPropertyUserApi" }, // Tên scope phải match với ApiScopes
                     ApiSecrets = { new Secret("KwanPropertyUserApiSecret".Sha256())}
                 }
              };
 
         /// <summary>
-        /// Phạm vi scope của api, api được truy cập tới claim nào
+        /// Phạm vi scope của api, truy cập tới scope của claim qua access_token
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<ApiScope> ApiScopes =>
@@ -102,7 +102,7 @@ namespace KwanProperty.IdentityServer4
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
                         "roles",
-                        "KwanPropertyUserApi",
+                        "KwanPropertyUserApi", // tên api scope
                         "subscription_level",
                         "country"
                     },
