@@ -322,9 +322,7 @@ namespace KwanProperty.IdentityServer4.Services
                 throw new ArgumentNullException(nameof(password));
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u =>
-            u.SecurityCode == securityCode &&
-            u.SecurityCodeExpirationDate >= DateTime.UtcNow);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.SecurityCode == securityCode && u.SecurityCodeExpirationDate >= DateTime.UtcNow);
 
             if (user == null)
             {

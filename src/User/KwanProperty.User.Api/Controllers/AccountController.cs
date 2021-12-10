@@ -12,5 +12,11 @@ namespace KwanProperty.User.Api.Controllers
         {
             return Ok("success");
         }
+
+        [HttpGet("custom-claim")]
+        public IActionResult GetCustomClaimOpenIdConnectPostConfiguration()
+        {
+            return Ok("PaidUser");
+        }
     }
 }

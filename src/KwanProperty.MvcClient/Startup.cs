@@ -1,5 +1,6 @@
-using IdentityModel;
+﻿using IdentityModel;
 using KwanProperty.MvcClient.HttpHandlers;
+using KwanProperty.MvcClient.PostConfigurationOptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -46,6 +48,7 @@ namespace KwanProperty.MvcClient
 
             services.AddTransient<BearerTokenHandler>();
 
+            #region Init HttpClient 
             // create an HttpClient used for accessing the User Api
             services.AddHttpClient("KwanUserApiClient", client =>
             {
@@ -54,6 +57,14 @@ namespace KwanProperty.MvcClient
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             }).AddHttpMessageHandler<BearerTokenHandler>();
 
+            // create an HttpClient without token used for accessing the User Api
+            services.AddHttpClient("BasicUserApiClient", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:44373/");
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            });
+
             // create an HttpClient used for accessing the IdentityServer
             services.AddHttpClient("IdentityServerClient", client =>
             {
@@ -61,6 +72,8 @@ namespace KwanProperty.MvcClient
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             });
+            #endregion
+
 
             services.AddAuthentication(options =>
             {
@@ -78,24 +91,23 @@ namespace KwanProperty.MvcClient
                 options.ClientId = "Mvc_Client";
                 options.ResponseType = "code";
 
-                options.Scope.Add("address");
+                // add các scope để truy cập tới claim
+                //options.Scope.Add("address");
                 options.Scope.Add("roles");
                 options.Scope.Add("KwanPropertyUserApi");
-                options.Scope.Add("subscription_level");
                 options.Scope.Add("country");
-                options.Scope.Add("offline_access");
+                options.Scope.Add("offline_access"); // support refresh_token
 
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.DeleteClaim("s_hash");
                 options.ClaimActions.DeleteClaim("auth_time");
 
-                options.ClaimActions.MapUniqueJsonKey("admin", "admin");
-                options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
-                options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");
-                options.ClaimActions.MapUniqueJsonKey("user", "user");
-                options.ClaimActions.MapUniqueJsonKey("subscription_level", "subscription_level");
-                options.ClaimActions.MapUniqueJsonKey("country", "country");
+                //options.ClaimActions.MapUniqueJsonKey("admin", "admin");
+                //options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
+                //options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");
+                //options.ClaimActions.MapUniqueJsonKey("user", "user");
+                //options.ClaimActions.MapUniqueJsonKey("country", "country");
 
 
                 options.SaveTokens = true;
@@ -107,6 +119,9 @@ namespace KwanProperty.MvcClient
                     RoleClaimType = JwtClaimTypes.Role
                 };
             });
+
+            services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>,
+              OpenIdConnectOptionsPostConfigureOptions>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

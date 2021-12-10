@@ -15,6 +15,8 @@ using IdentityServer4.EntityFramework.Mappers;
 using System.Linq;
 using KwanProperty.IdentityServer4.DbContexts;
 using KwanProperty.IdentityServer4.Services;
+using Microsoft.AspNetCore.Identity;
+using KwanProperty.IdentityServer4.Entities;
 
 namespace KwanProperty.IdentityServer4
 {
@@ -39,6 +41,7 @@ namespace KwanProperty.IdentityServer4
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IUserService, UserService>();
 
             var builder = services.AddIdentityServer(options =>
@@ -59,7 +62,7 @@ namespace KwanProperty.IdentityServer4
 
             var migrationsAssembly = typeof(Startup)
                 .GetTypeInfo().Assembly.GetName().Name;
-
+            
             builder.AddConfigurationStore(options =>
             {
                 options.ConfigureDbContext = builder =>
