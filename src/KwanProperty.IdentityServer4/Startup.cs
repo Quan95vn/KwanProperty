@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using System.Linq;
+using KwanProperty.IdentityServer4.DbContexts;
+using KwanProperty.IdentityServer4.Services;
 
 namespace KwanProperty.IdentityServer4
 {
@@ -32,16 +34,25 @@ namespace KwanProperty.IdentityServer4
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
 
+            services.AddDbContext<IdentityDbContext>(options =>
+            {
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            services.AddScoped<IUserService, UserService>();
+
             var builder = services.AddIdentityServer(options =>
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 //options.EmitStaticAudienceClaim = false;
-            })
-                //.AddInMemoryIdentityResources(Config.IdentityResources)
-                //.AddInMemoryApiResources(Config.ApiResources)
-                //.AddInMemoryApiScopes(Config.ApiScopes)
-                //.AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users);
+            });
+            //.AddInMemoryIdentityResources(Config.IdentityResources)
+            //.AddInMemoryApiResources(Config.ApiResources)
+            //.AddInMemoryApiScopes(Config.ApiScopes)
+            //.AddInMemoryClients(Config.Clients)
+            //.AddTestUsers(TestUsers.Users);
+
+            builder.AddProfileService<UserProfileService>();
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
