@@ -92,7 +92,7 @@ namespace KwanProperty.MvcClient
                 options.ResponseType = "code";
 
                 // add các scope để truy cập tới claim
-                //options.Scope.Add("address");
+                options.Scope.Add("address");
                 options.Scope.Add("roles");
                 options.Scope.Add("KwanPropertyUserApi");
                 options.Scope.Add("country");
@@ -103,11 +103,12 @@ namespace KwanProperty.MvcClient
                 options.ClaimActions.DeleteClaim("s_hash");
                 options.ClaimActions.DeleteClaim("auth_time");
 
-                //options.ClaimActions.MapUniqueJsonKey("admin", "admin");
-                //options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
+                options.ClaimActions.MapUniqueJsonKey("admin", "admin");
+                options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
                 //options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");
                 //options.ClaimActions.MapUniqueJsonKey("user", "user");
-                //options.ClaimActions.MapUniqueJsonKey("country", "country");
+                options.ClaimActions.MapUniqueJsonKey("address", "address");
+                options.ClaimActions.MapUniqueJsonKey("country", "country");
 
 
                 options.SaveTokens = true;
