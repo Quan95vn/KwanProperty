@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace KwanProperty.IdentityServer4.Quickstart.UserRegistration
@@ -111,6 +112,53 @@ namespace KwanProperty.IdentityServer4.Quickstart.UserRegistration
             //}
 
             //return Redirect("~/");
+
+        }
+
+        [HttpGet]
+        public IActionResult RegisterUserFromFacebook(RegisterUserFromFacebookInputViewModel model)
+        {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            return View(new RegisterUserFromFacebookViewModel()
+            {
+                GivenName = model.GivenName,
+                FamilyName = model.FamilyName,
+                Email = model.Email,
+                Provider = model.Provider,
+                ProviderUserId = model.ProviderUserId
+
+            });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegisterUserFromFacebook(RegisterUserFromFacebookViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            // create claims
+            var claims = new List<Claim>()
+            {
+                new Claim(JwtClaimTypes.Email, model.Email),
+                new Claim(JwtClaimTypes.GivenName, model.GivenName),
+                new Claim(JwtClaimTypes.FamilyName, model.FamilyName),
+                new Claim(JwtClaimTypes.Address, model.Address),
+                new Claim("country", model.Country)
+            };
+
+            // provision the user
+            _userService.ProvisionUserFromExternalIdentity(model.Provider, model.ProviderUserId, claims);
+            await _userService.SaveChangesAsync();
+
+            // redirect             
+            return RedirectToAction("Callback", "External");
 
         }
     }

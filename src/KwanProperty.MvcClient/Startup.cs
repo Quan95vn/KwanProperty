@@ -91,18 +91,19 @@ namespace KwanProperty.MvcClient
                 options.ClientId = "Mvc_Client";
                 options.ResponseType = "code";
 
-                // add các scope để truy cập tới claim
+                // cần add các scope vào để truy cập tới claim, scope này lấy từ AllowedScope của client
                 options.Scope.Add("address");
                 options.Scope.Add("roles");
                 options.Scope.Add("KwanPropertyUserApi");
                 options.Scope.Add("country");
                 options.Scope.Add("offline_access"); // support refresh_token
-
+ 
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.DeleteClaim("s_hash");
                 options.ClaimActions.DeleteClaim("auth_time");
 
+                // access các claim của của scope
                 options.ClaimActions.MapUniqueJsonKey("admin", "admin");
                 options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
                 //options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");

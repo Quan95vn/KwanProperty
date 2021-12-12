@@ -4,6 +4,9 @@ using IdentityServer4.Events;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServer4.Test;
+using KwanProperty.IdentityServer4.Entities;
+using KwanProperty.IdentityServer4.Quickstart.UserRegistration;
+using KwanProperty.IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,34 +24,39 @@ namespace IdentityServerHost.Quickstart.UI
     [AllowAnonymous]
     public class ExternalController : Controller
     {
-        private readonly TestUserStore _users;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly ILogger<ExternalController> _logger;
         private readonly IEventService _events;
+        private readonly IUserService _userService;
+        private readonly Dictionary<string, string> _facebookClaimTypeMap = new()
+        {
+            { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", JwtClaimTypes.GivenName},
+            { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", JwtClaimTypes.FamilyName},
+            { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", JwtClaimTypes.Email}
+        };
 
         public ExternalController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IEventService events,
             ILogger<ExternalController> logger,
-            TestUserStore users = null)
+            IUserService userService)
         {
-            // if the TestUserStore is not in DI, then we'll just use the global users collection
-            // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
-            _users = users ?? new TestUserStore(TestUsers.Users);
-
             _interaction = interaction;
             _clientStore = clientStore;
             _logger = logger;
             _events = events;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
+
+
 
         /// <summary>
         /// initiate roundtrip to external authentication provider
         /// </summary>
         [HttpGet]
-        public IActionResult Challenge(string scheme, string returnUrl)
+        public IActionResult Challenge(string provider, string returnUrl)
         {
             if (string.IsNullOrEmpty(returnUrl)) returnUrl = "~/";
 
@@ -66,11 +74,11 @@ namespace IdentityServerHost.Quickstart.UI
                 Items =
                 {
                     { "returnUrl", returnUrl }, 
-                    { "scheme", scheme },
+                    { "scheme", provider },
                 }
             };
 
-            return Challenge(props, scheme);
+            return Challenge(props, provider);
             
         }
 
@@ -94,13 +102,34 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             // lookup our user and external provider info
-            var (user, provider, providerUserId, claims) = FindUserFromExternalProvider(result);
+            var (user, provider, providerUserId, claims) = await  FindUserFromExternalProvider(result);
             if (user == null)
             {
                 // this might be where you might initiate a custom workflow for user registration
                 // in this sample we don't show how that would be done, as our sample implementation
                 // simply auto-provisions new external user
-                user = AutoProvisionUser(provider, providerUserId, claims);
+                if (provider == "Facebook")
+                {
+                    // redirect to the RegisterUserFromFacebook view.  
+                    return RedirectToAction(
+                        "RegisterUserFromFacebook",
+                        "UserRegistration",
+                           new RegisterUserFromFacebookInputViewModel()
+                           {
+                               Email = claims.FirstOrDefault(c =>
+                                   c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value,
+                               GivenName = claims.FirstOrDefault(c =>
+                                   c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value,
+                               FamilyName = claims.FirstOrDefault(c =>
+                                   c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value,
+                               Provider = provider,
+                               ProviderUserId = providerUserId
+                           });
+                }
+                //else
+                //{
+                //    user = await AutoProvisionWindowsUser(provider, providerUserId, claims);
+                //}
             }
 
             // this allows us to collect any additional claims or properties
@@ -108,10 +137,12 @@ namespace IdentityServerHost.Quickstart.UI
             // this is typically used to store data needed for signout from those protocols.
             var additionalLocalClaims = new List<Claim>();
             var localSignInProps = new AuthenticationProperties();
-            ProcessLoginCallback(result, additionalLocalClaims, localSignInProps);
-            
+            ProcessLoginCallbackForOidc(result, additionalLocalClaims, localSignInProps);
+            //ProcessLoginCallbackForWsFed(result, additionalLocalClaims, localSignInProps);
+            //ProcessLoginCallbackForSaml2p(result, additionalLocalClaims, localSignInProps);
+
             // issue authentication cookie for user
-            var isuser = new IdentityServerUser(user.SubjectId)
+            var isuser = new IdentityServerUser(user.Subject)
             {
                 DisplayName = user.Username,
                 IdentityProvider = provider,
@@ -128,10 +159,17 @@ namespace IdentityServerHost.Quickstart.UI
 
             // check if external login is in the context of an OIDC request
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-            await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.SubjectId, user.Username, true, context?.Client.ClientId));
+            await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.Subject, user.Username, true, context?.Client.ClientId));
 
             if (context != null)
             {
+                //if (await _clientStore.IsPkceClientAsync(context.Client.ClientId))
+                //{
+                //    // if the client is PKCE then we assume it's native, so this change in how to
+                //    // return the response is for better UX for the end user.
+                //    return View("Redirect", new RedirectViewModel { RedirectUrl = returnUrl });
+                //}
+
                 if (context.IsNativeClient())
                 {
                     // The client is native, so this change in how to
@@ -143,7 +181,7 @@ namespace IdentityServerHost.Quickstart.UI
             return Redirect(returnUrl);
         }
 
-        private (TestUser user, string provider, string providerUserId, IEnumerable<Claim> claims) FindUserFromExternalProvider(AuthenticateResult result)
+        private async Task<(User user, string provider, string providerUserId, IEnumerable<Claim> claims)> FindUserFromExternalProvider(AuthenticateResult result)
         {
             var externalUser = result.Principal;
 
@@ -162,15 +200,43 @@ namespace IdentityServerHost.Quickstart.UI
             var providerUserId = userIdClaim.Value;
 
             // find external user
-            var user = _users.FindByExternalProvider(provider, providerUserId);
+            var user = await _userService.GetUserByExternalProvider(provider, providerUserId);
 
             return (user, provider, providerUserId, claims);
         }
 
-        private TestUser AutoProvisionUser(string provider, string providerUserId, IEnumerable<Claim> claims)
+        private async Task<User> AutoProvisionUser(string provider, string providerUserId, IEnumerable<Claim> claims)
         {
-            var user = _users.AutoProvisionUser(provider, providerUserId, claims.ToList());
+            var mapperClaims = new List<Claim>();
+            foreach(var claim in claims)
+            {
+                if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                {
+                    mapperClaims.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                }
+            }
+
+            var user = _userService.ProvisionUserFromExternalIdentity(provider, providerUserId, new List<Claim>());
+            await _userService.SaveChangesAsync();
             return user;
+        }
+
+        private void ProcessLoginCallbackForOidc(AuthenticateResult externalResult, List<Claim> localClaims, AuthenticationProperties localSignInProps)
+        {
+            // if the external system sent a session id claim, copy it over
+            // so we can use it for single sign-out
+            var sid = externalResult.Principal.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.SessionId);
+            if (sid != null)
+            {
+                localClaims.Add(new Claim(JwtClaimTypes.SessionId, sid.Value));
+            }
+
+            // if the external provider issued an id_token, we'll keep it for signout
+            var id_token = externalResult.Properties.GetTokenValue("id_token");
+            if (id_token != null)
+            {
+                localSignInProps.StoreTokens(new[] { new AuthenticationToken { Name = "id_token", Value = id_token } });
+            }
         }
 
         // if the external login is OIDC-based, there are certain things we need to preserve to make logout work

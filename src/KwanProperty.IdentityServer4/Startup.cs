@@ -17,6 +17,10 @@ using KwanProperty.IdentityServer4.DbContexts;
 using KwanProperty.IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using KwanProperty.IdentityServer4.Entities;
+using IdentityServer4;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace KwanProperty.IdentityServer4
 {
@@ -77,10 +81,19 @@ namespace KwanProperty.IdentityServer4
                     options => options.MigrationsAssembly(migrationsAssembly));
             });
 
+            services.AddAuthentication().AddFacebook("Facebook", options =>
+            {
+                options.AppId = Configuration["Facebook:AppId"];
+                options.AppSecret = Configuration["Facebook:AppSecret"]; ;
+                options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+            });
+
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            ServicePointManager.ServerCertificateValidationCallback = delegate (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -110,42 +123,46 @@ namespace KwanProperty.IdentityServer4
                 serviceScope.ServiceProvider
                     .GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
 
-                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-                context.Database.Migrate();
-                if (!context.Clients.Any())
+                var configurationDbContext = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                configurationDbContext.Database.Migrate();
+                if (!configurationDbContext.Clients.Any())
                 {
                     foreach (var client in Config.Clients)
                     {
-                        context.Clients.Add(client.ToEntity());
+                        configurationDbContext.Clients.Add(client.ToEntity());
                     }
-                    context.SaveChanges();
+                    configurationDbContext.SaveChanges();
                 }
 
-                if (!context.IdentityResources.Any())
+                if (!configurationDbContext.IdentityResources.Any())
                 {
                     foreach (var resource in Config.IdentityResources)
                     {
-                        context.IdentityResources.Add(resource.ToEntity());
+                        configurationDbContext.IdentityResources.Add(resource.ToEntity());
                     }
-                    context.SaveChanges();
+                    configurationDbContext.SaveChanges();
                 }
 
-                if (!context.ApiResources.Any())
+                if (!configurationDbContext.ApiResources.Any())
                 {
                     foreach (var resource in Config.ApiResources)
                     {
-                        context.ApiResources.Add(resource.ToEntity());
+                        configurationDbContext.ApiResources.Add(resource.ToEntity());
                     }
-                    context.SaveChanges();
+                    configurationDbContext.SaveChanges();
                 }
-                if (!context.ApiScopes.Any())
+                if (!configurationDbContext.ApiScopes.Any())
                 {
                     foreach (var resource in Config.ApiScopes)
                     {
-                        context.ApiScopes.Add(resource.ToEntity());
+                        configurationDbContext.ApiScopes.Add(resource.ToEntity());
                     }
-                    context.SaveChanges();
+                    configurationDbContext.SaveChanges();
                 }
+
+                var identityDbContext = serviceScope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+                identityDbContext.Database.Migrate();
+
             }
         }
     }

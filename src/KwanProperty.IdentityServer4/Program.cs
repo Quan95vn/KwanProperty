@@ -15,6 +15,8 @@ namespace KwanProperty.IdentityServer4
     {
         public static int Main(string[] args)
         {
+          
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)

@@ -44,7 +44,7 @@ namespace KwanProperty.IdentityServer4
             };
 
         /// <summary>
-        /// Khai báo tài nguyên api
+        /// Khai báo ApiResource, tên của ApiResource có thể được để check với audience của các service API (option.Audience)
         /// </summary>
         public static IEnumerable<ApiResource> ApiResources =>
              new ApiResource[]
@@ -55,13 +55,13 @@ namespace KwanProperty.IdentityServer4
                     "Kwan Property User Api"
                 )
                 {
-                    Scopes = { "KwanPropertyUserApi" }, // Tên scope phải match với ApiScopes
+                    Scopes = { "KwanPropertyUserApi" }, // Tên scope lấy từ ApiScope
                     ApiSecrets = { new Secret("KwanPropertyUserApiSecret".Sha256())}
                 }
              };
 
         /// <summary>
-        /// Phạm vi scope của api, truy cập tới scope của claim qua access_token
+        /// Khai báo ApiScope, scope dành cho ApiResource
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<ApiScope> ApiScopes =>
@@ -96,6 +96,7 @@ namespace KwanProperty.IdentityServer4
                     {
                         "https://localhost:44327/signout-callback-oidc"
                     },
+                    // AllowedScope có thể vừa là tên của IdentityReource, vừa là thuộc tính Scopes trong ApiResource
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
