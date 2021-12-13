@@ -74,7 +74,6 @@ namespace KwanProperty.MvcClient
             });
             #endregion
 
-
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -96,20 +95,35 @@ namespace KwanProperty.MvcClient
                 options.Scope.Add("roles");
                 options.Scope.Add("KwanPropertyUserApi");
                 options.Scope.Add("country");
-                options.Scope.Add("offline_access"); // support refresh_token
- 
+                options.Scope.Add("IdentityNumber");
+
+                // sample scope load động từ phía client -> OpenIdConnectOptionsPostConfigureOptions
+                options.Scope.Add("subscription_level"); 
+                // support refresh_token
+                options.Scope.Add("offline_access"); 
+
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.DeleteClaim("s_hash");
                 options.ClaimActions.DeleteClaim("auth_time");
 
-                // access các claim của của scope
+                // access các claim của scope, cần phải map tay 
+                options.ClaimActions.MapUniqueJsonKey("address", "address");
+
+                options.ClaimActions.MapUniqueJsonKey("country", "country");
+                options.ClaimActions.MapUniqueJsonKey("country1", "country1");
+
+                options.ClaimActions.MapUniqueJsonKey("subscription_level", "subscription_level");
+                options.ClaimActions.MapUniqueJsonKey("subscription_level1", "subscription_level1");
+
+                options.ClaimActions.MapUniqueJsonKey("IdentityNumber_Old", "IdentityNumber_Old");
+                options.ClaimActions.MapUniqueJsonKey("IdentityNumber_New", "IdentityNumber_New");
+
                 options.ClaimActions.MapUniqueJsonKey("admin", "admin");
                 options.ClaimActions.MapUniqueJsonKey("super_user", "super_user");
-                //options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");
-                //options.ClaimActions.MapUniqueJsonKey("user", "user");
-                options.ClaimActions.MapUniqueJsonKey("address", "address");
-                options.ClaimActions.MapUniqueJsonKey("country", "country");
+                options.ClaimActions.MapUniqueJsonKey("moderator", "moderator");
+                options.ClaimActions.MapUniqueJsonKey("user", "user");
+
 
 
                 options.SaveTokens = true;
@@ -122,8 +136,8 @@ namespace KwanProperty.MvcClient
                 };
             });
 
-            services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>,
-              OpenIdConnectOptionsPostConfigureOptions>();
+            //services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>,
+            //  OpenIdConnectOptionsPostConfigureOptions>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

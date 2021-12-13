@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace KwanProperty.MvcClient.HttpHandlers
 {
+    /// <summary>
+    /// Hanlder để xử lý việc add token trc khi send request đi
+    /// </summary>
     public class BearerTokenHandler : DelegatingHandler
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

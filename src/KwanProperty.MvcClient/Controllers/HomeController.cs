@@ -70,10 +70,8 @@ namespace KwanProperty.MvcClient.Controllers
             var identityToken = await HttpContext
             .GetTokenAsync(OpenIdConnectParameterNames.IdToken);
 
-            // write it out
             Debug.WriteLine($"Identity token: {identityToken}");
 
-            // write out the user claims
             foreach (var claim in User.Claims)
             {
                 Debug.WriteLine($"Claim type: {claim.Type} - Claim value: {claim.Value}");

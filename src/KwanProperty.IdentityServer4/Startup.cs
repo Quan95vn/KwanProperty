@@ -18,9 +18,6 @@ using KwanProperty.IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using KwanProperty.IdentityServer4.Entities;
 using IdentityServer4;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 
 namespace KwanProperty.IdentityServer4
 {
@@ -52,34 +49,34 @@ namespace KwanProperty.IdentityServer4
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 //options.EmitStaticAudienceClaim = false;
-            });
-            //.AddInMemoryIdentityResources(Config.IdentityResources)
-            //.AddInMemoryApiResources(Config.ApiResources)
-            //.AddInMemoryApiScopes(Config.ApiScopes)
-            //.AddInMemoryClients(Config.Clients)
-            //.AddTestUsers(TestUsers.Users);
+            })
+            .AddInMemoryIdentityResources(Config.IdentityResources)
+            .AddInMemoryApiResources(Config.ApiResources)
+            .AddInMemoryApiScopes(Config.ApiScopes)
+            .AddInMemoryClients(Config.Clients)
+            .AddTestUsers(TestUsers.Users);
 
-            builder.AddProfileService<UserProfileService>();
+            //builder.AddProfileService<UserProfileService>(); // lấy claim từ bảng UserClaims
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
 
             var migrationsAssembly = typeof(Startup)
                 .GetTypeInfo().Assembly.GetName().Name;
-            
-            builder.AddConfigurationStore(options =>
-            {
-                options.ConfigureDbContext = builder =>
-                    builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
-                    options => options.MigrationsAssembly(migrationsAssembly));
-            });
 
-            builder.AddOperationalStore(options =>
-            {
-                options.ConfigureDbContext = builder =>
-                    builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
-                    options => options.MigrationsAssembly(migrationsAssembly));
-            });
+            //builder.AddConfigurationStore(options =>
+            //{
+            //    options.ConfigureDbContext = builder =>
+            //        builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
+            //        options => options.MigrationsAssembly(migrationsAssembly));
+            //});
+
+            //builder.AddOperationalStore(options =>
+            //{
+            //    options.ConfigureDbContext = builder =>
+            //        builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
+            //        options => options.MigrationsAssembly(migrationsAssembly));
+            //});
 
             services.AddAuthentication().AddFacebook("Facebook", options =>
             {
@@ -92,14 +89,12 @@ namespace KwanProperty.IdentityServer4
 
         public void Configure(IApplicationBuilder app)
         {
-            ServicePointManager.ServerCertificateValidationCallback = delegate (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
-
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            InitializeDatabase(app);
+            //InitializeDatabase(app);
 
             // uncomment if you want to add MVC
             app.UseStaticFiles();

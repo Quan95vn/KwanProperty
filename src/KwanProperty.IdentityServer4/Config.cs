@@ -11,7 +11,7 @@ namespace KwanProperty.IdentityServer4
     public static class Config
     {
         /// <summary>
-        /// Danh sách tài nguyên được phép truy cập, trong mỗi tài nguyên có thể truy cập tới nhiều claim
+        /// Danh sách tài nguyên được phép truy cập, User có thể truy cập tới claim nếu IdentityResource nằm trong AllowedScope của client
         /// </summary>
         public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
@@ -31,20 +31,28 @@ namespace KwanProperty.IdentityServer4
                     "Subscription Level",
                     new List<string>
                     {
-                        "subscription_level"
+                        "subscription_level", "subscription_level1", "subscription_level2"
                     }),
                  new IdentityResource(
                     "country",
                     "Country",
                     new List<string>
                     {
-                        "country"
+                        "country", "country1", "country2", "country3"
+                    }),
+
+                new IdentityResource(
+                    "IdentityNumber",
+                    "IdentityNumber",
+                    new List<string>
+                    {
+                        "IdentityNumber_Old", "IdentityNumber_New"
                     }),
 
             };
 
         /// <summary>
-        /// Khai báo ApiResource, tên của ApiResource có thể được để check với audience của các service API (option.Audience)
+        /// Khai báo ApiResource, tên của ApiResource được đùng để check với audience của các service API (option.Audience)
         /// </summary>
         public static IEnumerable<ApiResource> ApiResources =>
              new ApiResource[]
@@ -70,8 +78,8 @@ namespace KwanProperty.IdentityServer4
                 new ApiScope(
                     "KwanPropertyUserApi",
                     "KwanProperty Api Scope",
-                    new List<string> { "admin", "super_user"}) // claim sẽ được thêm trong access_token
-            };        
+                    new List<string> { "admin", "super_user", "moderator" }) // claim sẽ được thêm trong access_token
+            };
 
         /// <summary>
         /// Danh sách client và config tài nguyền client đc truy cập
@@ -81,7 +89,7 @@ namespace KwanProperty.IdentityServer4
             {
                 new Client
                 {
-                    AccessTokenLifetime = 120,
+                    AccessTokenLifetime = 30,
                     AllowOfflineAccess = true,
                     UpdateAccessTokenClaimsOnRefresh = true,
                     ClientName = "Mvc",
@@ -96,16 +104,21 @@ namespace KwanProperty.IdentityServer4
                     {
                         "https://localhost:44327/signout-callback-oidc"
                     },
-                    // AllowedScope có thể vừa là tên của IdentityReource, vừa là thuộc tính Scopes trong ApiResource
+
+                    AlwaysIncludeUserClaimsInIdToken = false,
+                    // AllowedScope có thể vừa là tên của IdentityReource, vừa là tên của ApiResource
                     AllowedScopes =
                     {
+                        // tên của IdentityResource
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
                         "roles",
-                        "KwanPropertyUserApi", // tên api scope
                         "subscription_level",
-                        "country"
+                        "country",
+                        "IdentityNumber",
+                        // tên của ApiResource
+                        "KwanPropertyUserApi", 
                     },
                     ClientSecrets =
                     {

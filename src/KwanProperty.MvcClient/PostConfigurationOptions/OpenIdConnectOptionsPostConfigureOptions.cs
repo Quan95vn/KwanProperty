@@ -10,6 +10,9 @@ using System.Text.Json;
 
 namespace KwanProperty.MvcClient.PostConfigurationOptions
 {
+    /// <summary>
+    /// Lấy custom claim sau khi OpenIdConnect đã được hoàn thành
+    /// </summary>
     public class OpenIdConnectOptionsPostConfigureOptions
         : IPostConfigureOptions<OpenIdConnectOptions>
     {
