@@ -97,11 +97,16 @@ namespace KwanProperty.MvcClient
                 options.ResponseType = "code";
 
                 // cần add các scope vào để truy cập tới claim, scope này lấy từ AllowedScope của client
+                // đây là scope thuộc IdentityResource
                 options.Scope.Add("address");
                 options.Scope.Add("roles");
                 options.Scope.Add("KwanPropertyUserApi");
                 options.Scope.Add("country");
                 options.Scope.Add("IdentityNumber");
+
+                // đây là scope của ApiScope -> để xác định Audience của api service
+                options.Scope.Add("KwanPropertyEventCatalog.FullAccess");
+                options.Scope.Add("KwanPropertyGateway.FullAccess");
 
                 // sample scope load động từ phía client -> OpenIdConnectOptionsPostConfigureOptions
                 options.Scope.Add("subscription_level"); 
@@ -118,6 +123,7 @@ namespace KwanProperty.MvcClient
 
                 options.ClaimActions.MapUniqueJsonKey("country", "country");
                 options.ClaimActions.MapUniqueJsonKey("country1", "country1");
+                options.ClaimActions.MapUniqueJsonKey("country3", "country3");
 
                 options.ClaimActions.MapUniqueJsonKey("subscription_level", "subscription_level");
                 options.ClaimActions.MapUniqueJsonKey("subscription_level1", "subscription_level1");

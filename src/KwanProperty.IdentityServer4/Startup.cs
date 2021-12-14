@@ -47,8 +47,13 @@ namespace KwanProperty.IdentityServer4
 
             var builder = services.AddIdentityServer(options =>
             {
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-                //options.EmitStaticAudienceClaim = false;
+                options.EmitStaticAudienceClaim = true;
             })
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiResources(Config.ApiResources)
