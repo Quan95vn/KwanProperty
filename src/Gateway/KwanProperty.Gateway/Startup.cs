@@ -31,6 +31,7 @@ namespace KwanProperty.Gateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // sub => http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             //AuthenticationScheme dùng trong config ocelot để thực hiện việc chứng thực request
