@@ -1,5 +1,6 @@
 ﻿using IdentityModel.Client;
 using KwanProperty.MvcClient.Models;
+using KwanProperty.MvcClient.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -19,11 +20,13 @@ namespace KwanProperty.MvcClient.Controllers
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IEventCatalogService _eventCatalogService;
 
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IHttpClientFactory httpClientFactory, IEventCatalogService eventCatalogService)
         {
             _httpClientFactory = httpClientFactory ??
                 throw new ArgumentNullException(nameof(httpClientFactory));
+            _eventCatalogService = eventCatalogService;
         }
 
         [Authorize(Policy = "PaidUserCanCallGetUserApi")]
@@ -78,7 +81,6 @@ namespace KwanProperty.MvcClient.Controllers
             }
         }
 
-
         public async Task<IActionResult> Address()
         {
             var idpClient = _httpClientFactory.CreateClient("IdentityServerClient");
@@ -114,7 +116,6 @@ namespace KwanProperty.MvcClient.Controllers
 
             return View(new HomeViewModel(address));
         }
-
 
         public async Task Logout()
         {
@@ -168,5 +169,12 @@ namespace KwanProperty.MvcClient.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public async Task<IActionResult> Events()
+        {
+            var result = await _eventCatalogService.GetAll();
+            return View(new EventCatalogViewModel(result));
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using IdentityModel;
 using KwanProperty.MvcClient.HttpHandlers;
 using KwanProperty.MvcClient.PostConfigurationOptions;
+using KwanProperty.MvcClient.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -72,6 +73,11 @@ namespace KwanProperty.MvcClient
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             });
+
+            // create an HttpClient used for EventCatalog service
+            services.AddHttpClient<IEventCatalogService, EventCatalogService>(c =>
+              c.BaseAddress = new Uri(Configuration["ApiConfigs:EventCatalog:Uri"]));
+
             #endregion
 
             services.AddAuthentication(options =>
