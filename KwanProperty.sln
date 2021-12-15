@@ -15,11 +15,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KwanProperty.User.Api", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{ADC0A6B6-9867-4FFD-B11F-1975CCED35F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KwanProperty.Gateway", "src\Gateway\KwanProperty.Gateway\KwanProperty.Gateway.csproj", "{4D3EB064-2ED6-4E6B-A25C-F2C341F5A2A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KwanProperty.Gateway", "src\Gateway\KwanProperty.Gateway\KwanProperty.Gateway.csproj", "{4D3EB064-2ED6-4E6B-A25C-F2C341F5A2A5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{722243D0-550C-4FF3-B86A-AF7C570AE4EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KwanProperty.Services.EventCatalog", "src\Services\KwanProperty.Services.EventCatalog\KwanProperty.Services.EventCatalog.csproj", "{3BE911C3-C632-46A0-B2E4-D9A5EED259EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KwanProperty.Services.EventCatalog", "src\Services\KwanProperty.Services.EventCatalog\KwanProperty.Services.EventCatalog.csproj", "{3BE911C3-C632-46A0-B2E4-D9A5EED259EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KwanProperty.Services.Order", "src\Services\KwanProperty.Services.Order\KwanProperty.Services.Order.csproj", "{DEE9471D-3F9A-49BF-A2CC-B2E216C92594}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KwanProperty.Services.Basket", "src\Services\KwanProperty.Services.Basket\KwanProperty.Services.Basket.csproj", "{165232C5-B4AC-45BD-B2B0-221434B74BD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +51,14 @@ Global
 		{3BE911C3-C632-46A0-B2E4-D9A5EED259EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BE911C3-C632-46A0-B2E4-D9A5EED259EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BE911C3-C632-46A0-B2E4-D9A5EED259EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEE9471D-3F9A-49BF-A2CC-B2E216C92594}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEE9471D-3F9A-49BF-A2CC-B2E216C92594}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEE9471D-3F9A-49BF-A2CC-B2E216C92594}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEE9471D-3F9A-49BF-A2CC-B2E216C92594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{165232C5-B4AC-45BD-B2B0-221434B74BD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{165232C5-B4AC-45BD-B2B0-221434B74BD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{165232C5-B4AC-45BD-B2B0-221434B74BD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{165232C5-B4AC-45BD-B2B0-221434B74BD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +72,8 @@ Global
 		{4D3EB064-2ED6-4E6B-A25C-F2C341F5A2A5} = {ADC0A6B6-9867-4FFD-B11F-1975CCED35F9}
 		{722243D0-550C-4FF3-B86A-AF7C570AE4EA} = {BA9D701F-93A6-4CF9-AA77-E3A01A99B552}
 		{3BE911C3-C632-46A0-B2E4-D9A5EED259EF} = {722243D0-550C-4FF3-B86A-AF7C570AE4EA}
+		{DEE9471D-3F9A-49BF-A2CC-B2E216C92594} = {722243D0-550C-4FF3-B86A-AF7C570AE4EA}
+		{165232C5-B4AC-45BD-B2B0-221434B74BD1} = {722243D0-550C-4FF3-B86A-AF7C570AE4EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {71C626BD-9BF2-42D8-908F-68BBA23CCBC9}
